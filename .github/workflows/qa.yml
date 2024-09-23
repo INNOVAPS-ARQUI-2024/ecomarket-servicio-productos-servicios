@@ -19,7 +19,7 @@ jobs:
 
       - name: Deploy to QA
         run: |
-          ssh -p 13113 -o StrictHostKeyChecking=no estudiante@4.tcp.ngrok.io "bash /home/estudiante/script_qa_prueba.sh"
+          sshpass -p "Escarabajo-Bas1l" ssh -p 13113 -o StrictHostKeyChecking=no estudiante@4.tcp.ngrok.io "bash /home/estudiante/script_qa_prueba.sh"
         env:
           QA_SERVER_IP: ${{ secrets.QA_SERVER_IP }}
           QA_USER: ${{ secrets.QA_USER }}
