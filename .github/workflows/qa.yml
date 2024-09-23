@@ -13,18 +13,13 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.9.0
+        uses: webfactory/ssh-agent@v0.8.1
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Setup SSH Reverse Tunnel
-        run: | 
-          ssh -o StrictHostKeyChecking=no -R 10022:localhost:22 ${QA_USER_WINDOWS}@${{ secrets.WINDOWS_SERVER_IP }}
-
       - name: Deploy to QA
         run: |
-          ssh -o StrictHostKeyChecking=no -p 10022 ${QA_USER}@localhost "bash /home/estudiante/script_qa_prueba.sh"
+          ssh -p 17851 -o StrictHostKeyChecking=no estudiante@2.tcp.ngrok.io "bash /home/estudiante/script_qa_prueba.sh"
         env:
-          QA_USER_WINDOWS: ${{ secrets.QA_USER_WINDOWS }}
-          WINDOWS_SERVER_IP: ${{ secrets.WINDOWS_SERVER_IP }}
+          QA_SERVER_IP: ${{ secrets.QA_SERVER_IP }}
           QA_USER: ${{ secrets.QA_USER }}
