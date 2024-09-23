@@ -17,9 +17,14 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      - name: Setup SSH Reverse Tunnel
+        run: | 
+          ssh -o StrictHostKeyChecking=no -R 10022:localhost:22 ${QA_USER_WINDOWS}@${{ secrets.WINDOWS_SERVER_IP }}
+
       - name: Deploy to QA
         run: |
-          ssh -o StrictHostKeyChecking=no estudiante@${{ secrets.QA_SERVER_IP }} "bash /home/estudiante/script_qa_prueba.sh"
+          ssh -o StrictHostKeyChecking=no -p 10022 ${QA_USER}@localhost "bash /home/estudiante/script_qa_prueba.sh"
         env:
-          QA_SERVER_IP: ${{ secrets.QA_SERVER_IP }}
+          QA_USER_WINDOWS: ${{ secrets.QA_USER_WINDOWS }}
+          WINDOWS_SERVER_IP: ${{ secrets.WINDOWS_SERVER_IP }}
           QA_USER: ${{ secrets.QA_USER }}
