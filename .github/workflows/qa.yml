@@ -1,0 +1,25 @@
+name: CI/CD to QA Environment
+
+on:
+  push:
+    branches:
+      - release
+
+jobs:
+  deploy-to-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.8.1
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Deploy to QA
+        run: |
+          ssh -o StrictHostKeyChecking=no estudiante@QA_SERVER_IP "bash /home/estudiante/script_qa_prueba.sh"
+        env:
+          QA_SERVER_IP: ${{ secrets.QA_SERVER_IP }}
+          QA_USER: ${{ secrets.QA_USER }}
