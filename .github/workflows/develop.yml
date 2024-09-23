@@ -1,12 +1,12 @@
-name: Build and Test on Develop
+name: Deploy to QA
 
 on:
   push:
     branches:
-      - develop
+      - release
 
 jobs:
-  build-and-test:
+  deploy-to-qa:
     runs-on: ubuntu-latest
 
     steps:
@@ -16,7 +16,7 @@ jobs:
       - name: Set up JDK 17
         uses: actions/setup-java@v2
         with:
-          distribution: 'temurin' # Usamos la distribución Temurin para JDK 17
+          distribution: 'temurin' 
           java-version: '17'
 
       - name: Cache Gradle packages
@@ -34,8 +34,23 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean build
 
-      - name: Run tests
-        run: ./gradlew test
-
       - name: Build Docker Image
-        run: docker build -t ecomarket-servicio-productos-servicios:develop .
+        run: docker build -t ecomarket-servicio-productos-servicios:qa .
+
+      - name: Save Docker Image to Tar File
+        run: docker save ecomarket-servicio-productos-servicios:qa -o ecomarket-servicio-productos-servicios-qa.tar
+
+      - name: Install sshpass
+        run: sudo apt-get update && sudo apt-get install -y sshpass
+
+      - name: Copy Docker Image to QA Server
+        run: |
+          sshpass -p "${{ secrets.QA_SERVER_PASSWORD }}" scp -P ${{ secrets.QA_SERVER_PORT }} -o StrictHostKeyChecking=no mi-aplicacion-qa.tar ${{ secrets.QA_SERVER_USER }}@${{ secrets.QA_SERVER_HOST }}:/tmp/mi-aplicacion-qa.tar
+
+      - name: Load Docker Image and Run Container on QA Server
+        run: |
+          sshpass -p "${{ secrets.QA_SERVER_PASSWORD }}" ssh -p ${{ secrets.QA_SERVER_PORT }} -o StrictHostKeyChecking=no ${{ secrets.QA_SERVER_USER }}@${{ secrets.QA_SERVER_HOST }} "
+          docker load -i /tmp/ecomarket-servicio-productos-servicios-qa.tar &&
+          docker stop ecomarket-servicio-productos-servicios-qa || true &&
+          docker rm ecomarket-servicio-productos-servicios-qa || true &&
+          docker run -d --name ecomarket-servicio-productos-servicios-qa -p 8080:8080 ecomarket-servicio-productos-servicios:qa"
