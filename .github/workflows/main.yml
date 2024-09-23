@@ -40,25 +40,18 @@ jobs:
       - name: Save Docker Image to Tar File
         run: docker save ecomarket-servicio-productos-servicios:prod -o ecomarket-servicio-productos-servicios-prod.tar
 
+      - name: Install sshpass
+        run: sudo apt-get update && sudo apt-get install -y sshpass
+
       - name: Copy Docker Image to Production Server
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.PROD_SERVER_HOST }}
-          username: ${{ secrets.PROD_SERVER_USER }}
-          key: ${{ secrets.PROD_SERVER_SSH_KEY }}
-          port: ${{ secrets.PROD_SERVER_PORT }}
-          source: "ecomarket-servicio-productos-servicios-prod.tar"
-          target: "/tmp/ecomarket-servicio-productos-servicios-prod.tar"
+        run: |
+          sshpass -p "${{ secrets.PROD_SERVER_PASSWORD }}" scp -P ${{ secrets.PROD_SERVER_PORT }} -o StrictHostKeyChecking=no mi-aplicacion-prod.tar ${{ secrets.PROD_SERVER_USER }}@${{ secrets.PROD_SERVER_HOST }}:/tmp/mi-aplicacion-prod.tar
 
       - name: Load Docker Image and Run Container on Production Server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.PROD_SERVER_HOST }}
-          username: ${{ secrets.PROD_SERVER_USER }}
-          key: ${{ secrets.PROD_SERVER_SSH_KEY }}
-          port: ${{ secrets.PROD_SERVER_PORT }}
-          script: |
-            docker load -i /tmp/ecomarket-servicio-productos-servicios-prod.tar
-            docker stop ecomarket-servicio-productos-servicios-prod || true
-            docker rm ecomarket-servicio-productos-servicios-prod || true
-            docker run -d --name ecomarket-servicio-productos-servicios-prod -p 8080:8080 ecomarket-servicio-productos-servicios:prod
+        run: |
+          sshpass -p "${{ secrets.PROD_SERVER_PASSWORD }}" ssh -p ${{ secrets.PROD_SERVER_PORT }} -o StrictHostKeyChecking=no ${{ secrets.PROD_SERVER_USER }}@${{ secrets.PROD_SERVER_HOST }} "
+          docker load -i /tmp/ecomarket-servicio-productos-servicios-prod.tar &&
+          docker stop ecomarket-servicio-productos-servicios-prod || true &&
+          docker rm ecomarket-servicio-productos-servicios-prod || true &&
+          docker run -d --name ecomarket-servicio-productos-servicios-prod -p 8080:8080 ecomarket-servicio-productos-servicios:prod"
+          
