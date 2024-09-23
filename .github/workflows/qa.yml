@@ -13,13 +13,13 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.8.1
+        uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Deploy to QA
         run: |
-          ssh -o StrictHostKeyChecking=no estudiante@QA_SERVER_IP "bash /home/estudiante/script_qa_prueba.sh"
+          sshpass -p "Escarabajo-Bas1l" ssh -p 13113 -o StrictHostKeyChecking=no estudiante@4.tcp.ngrok.io "bash /home/estudiante/script_qa_prueba.sh"
         env:
           QA_SERVER_IP: ${{ secrets.QA_SERVER_IP }}
           QA_USER: ${{ secrets.QA_USER }}
