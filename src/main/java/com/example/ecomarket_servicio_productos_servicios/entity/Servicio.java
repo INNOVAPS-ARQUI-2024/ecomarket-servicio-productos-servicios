@@ -1,4 +1,4 @@
-package com.example.ecomarket_servicio_productos_servicios.model;
+package com.example.ecomarket_servicio_productos_servicios.entity;
 
 import java.util.Date;
 import java.util.List;
