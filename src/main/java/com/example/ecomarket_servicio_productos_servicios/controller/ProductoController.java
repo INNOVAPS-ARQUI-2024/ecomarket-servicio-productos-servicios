@@ -18,7 +18,7 @@ import com.example.ecomarket_servicio_productos_servicios.model.Producto;
 import com.example.ecomarket_servicio_productos_servicios.service.ProductoService;
 
 @RestController
-@RequestMapping("/api/productos")
+@RequestMapping("/productos")
 @CrossOrigin(origins = "http://localhost:4200")
 public class ProductoController {
 
