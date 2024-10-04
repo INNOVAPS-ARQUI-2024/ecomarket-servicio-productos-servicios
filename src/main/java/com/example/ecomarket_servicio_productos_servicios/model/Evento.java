@@ -17,4 +17,6 @@ public class Evento {
     private String descripcion;
     private int rangoPrecios;
     private Date fechaHora;
+    private String userId;
+
 }

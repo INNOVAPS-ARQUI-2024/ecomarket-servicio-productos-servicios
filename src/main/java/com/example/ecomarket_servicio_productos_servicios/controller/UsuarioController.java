@@ -24,7 +24,7 @@ public class UsuarioController {
     @Autowired
     private UsuarioService usuarioService;
 
-    @PostMapping("/crear")
+    @PostMapping()
     public ResponseEntity<String> crearUsuario(@RequestBody Usuario usuario) {
         try {
             String uid = usuarioService.crearUsuario(usuario);
@@ -44,7 +44,7 @@ public class UsuarioController {
         }
     }
 
-    @PutMapping("/actualizar/{userId}")
+    @PutMapping("/{userId}")
     public ResponseEntity<String> actualizarUsuario(@PathVariable String userId, @RequestBody Usuario usuario) {
         try {
             usuario.setUserId(userId);  // Asegurarse de actualizar el usuario correcto
@@ -55,7 +55,7 @@ public class UsuarioController {
         }
     }
 
-    @DeleteMapping("/deshabilitar/{userId}")
+    @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deshabilitarUsuario(@PathVariable String userId) {
         try {
             usuarioService.deshabilitarUsuario(userId);

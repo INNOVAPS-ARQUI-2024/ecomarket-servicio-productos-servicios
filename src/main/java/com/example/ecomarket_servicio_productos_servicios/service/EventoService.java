@@ -41,6 +41,7 @@ public class EventoService {
             evento.setFechaHora(detallesEvento.getFechaHora());
             evento.setRangoPrecios(detallesEvento.getRangoPrecios());
             evento.setFechaHora(new Date());
+            evento.setUserId(detallesEvento.getUserId());
             return eventoRepository.save(evento);
         }
         return null;
