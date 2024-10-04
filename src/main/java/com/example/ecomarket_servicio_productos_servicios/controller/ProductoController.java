@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.ecomarket_servicio_productos_servicios.model.Producto;
+import com.example.ecomarket_servicio_productos_servicios.entity.Producto;
 import com.example.ecomarket_servicio_productos_servicios.service.ProductoService;
 
 @RestController

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.ecomarket_servicio_productos_servicios.model.Servicio;
+import com.example.ecomarket_servicio_productos_servicios.entity.Servicio;
 import com.example.ecomarket_servicio_productos_servicios.service.ServicioService;
 
 @RestController
