@@ -29,6 +29,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/pedidos/**").authenticated()
                 .requestMatchers("/api/transacciones/**").authenticated()
                 .requestMatchers("/api/notificaciones/**").authenticated()
+                .requestMatchers("/api/evento/**").authenticated()
                 // Cualquier otra solicitud debe ser autenticada
                 .anyRequest().permitAll())
             .addFilterBefore(firebaseAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // Agregar filtro de Firebase

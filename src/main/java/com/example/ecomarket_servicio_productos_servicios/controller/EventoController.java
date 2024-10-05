@@ -64,6 +64,4 @@ public class EventoController {
             return ResponseEntity.notFound().build();
         }
     }
-
-
 }

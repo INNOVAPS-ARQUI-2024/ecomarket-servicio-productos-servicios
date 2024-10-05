@@ -39,7 +39,7 @@ public class EventoService {
             evento.setDescripcion(detallesEvento.getDescripcion());
             evento.setLugar(detallesEvento.getLugar());
             evento.setFechaHora(detallesEvento.getFechaHora());
-            evento.setRangoPrecios(detallesEvento.getRangoPrecios());
+            evento.setRangoPrecios(detallesEvento.getRangoPrecios()); // Ahora es una lista de Longs
             evento.setFechaHora(new Date());
             evento.setUserId(detallesEvento.getUserId());
             return eventoRepository.save(evento);

@@ -1,6 +1,7 @@
 package com.example.ecomarket_servicio_productos_servicios.model;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -15,8 +16,7 @@ public class Evento {
     private String nombre;
     private String lugar;
     private String descripcion;
-    private int rangoPrecios;
+    private List<Long> rangoPrecios; // Cambiado a lista para rango de precios [min, max]
     private Date fechaHora;
     private String userId;
-
 }
