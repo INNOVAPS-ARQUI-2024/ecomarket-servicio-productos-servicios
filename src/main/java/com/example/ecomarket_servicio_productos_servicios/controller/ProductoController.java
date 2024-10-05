@@ -37,14 +37,25 @@ public class ProductoController {
     }
 
     @PostMapping
-    public Producto crearProducto(@RequestBody Producto producto) {
-        return productoService.guardarProducto(producto);
+    public ResponseEntity<Producto> crearProducto(@RequestBody Producto producto) {
+        try {
+            Producto nuevoProducto = productoService.guardarProducto(producto);
+            return ResponseEntity.status(201).body(nuevoProducto);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(400).body(null); // Solicitud incorrecta
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Producto> actualizarProducto(@PathVariable String id, @RequestBody Producto detallesProducto) {
-        Producto productoActualizado = productoService.actualizarProducto(id, detallesProducto);
-        return productoActualizado != null ? ResponseEntity.ok(productoActualizado) : ResponseEntity.notFound().build();
+    public ResponseEntity<Producto> actualizarProducto(@PathVariable String id,
+            @RequestBody Producto detallesProducto) {
+        try {
+            Producto productoActualizado = productoService.actualizarProducto(id, detallesProducto);
+            return productoActualizado != null ? ResponseEntity.ok(productoActualizado)
+                    : ResponseEntity.notFound().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(400).body(null); // Solicitud incorrecta
+        }
     }
 
     @DeleteMapping("/{id}")
