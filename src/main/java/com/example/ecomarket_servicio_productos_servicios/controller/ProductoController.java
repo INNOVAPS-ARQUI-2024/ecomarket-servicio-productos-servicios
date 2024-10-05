@@ -52,4 +52,10 @@ public class ProductoController {
         boolean fueEliminado = productoService.eliminarProducto(id);
         return fueEliminado ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
+
+    @GetMapping("/usuario/{sellerId}")
+    public ResponseEntity<List<Producto>> obtenerProductosPorUsuario(@PathVariable String sellerId) {
+        List<Producto> productos = productoService.obtenerProductosPorUsuario(sellerId);
+        return ResponseEntity.ok(productos);
+    }
 }
