@@ -29,7 +29,7 @@ public class ProductoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Producto> obtenerProductoPorId(@PathVariable String id) {
+    public ResponseEntity<Producto> obtenerProductoPorId(@PathVariable("id") String id) {
         Producto producto = productoService.obtenerProductoPorId(id);
         return producto != null ? ResponseEntity.ok(producto) : ResponseEntity.notFound().build();
     }
@@ -45,7 +45,7 @@ public class ProductoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Producto> actualizarProducto(@PathVariable String id,
+    public ResponseEntity<Producto> actualizarProducto(@PathVariable("id") String id,
             @RequestBody Producto detallesProducto) {
         try {
             Producto productoActualizado = productoService.actualizarProducto(id, detallesProducto);
@@ -57,13 +57,13 @@ public class ProductoController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarProducto(@PathVariable String id) {
+    public ResponseEntity<Void> eliminarProducto(@PathVariable("id") String id) {
         boolean fueEliminado = productoService.eliminarProducto(id);
         return fueEliminado ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 
     @GetMapping("/usuario/{sellerId}")
-    public ResponseEntity<List<Producto>> obtenerProductosPorUsuario(@PathVariable String sellerId) {
+    public ResponseEntity<List<Producto>> obtenerProductosPorUsuario(@PathVariable("sellerId") String sellerId) {
         List<Producto> productos = productoService.obtenerProductosPorUsuario(sellerId);
         return ResponseEntity.ok(productos);
     }
