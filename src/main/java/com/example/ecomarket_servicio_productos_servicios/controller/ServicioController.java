@@ -1,6 +1,7 @@
 package com.example.ecomarket_servicio_productos_servicios.controller;
 
 import java.util.List;
+import java.net.URI;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -39,19 +40,20 @@ public class ServicioController {
     }
 
     @PostMapping
-    public Servicio crearServicio(@RequestBody Servicio servicio) {
-        return servicioService.guardarServicio(servicio);
+    public ResponseEntity<Servicio> crearServicio(@RequestBody Servicio servicio) {
+        Servicio nuevoServicio = servicioService.guardarServicio(servicio);
+        return ResponseEntity.created(URI.create("/api/servicios/" + nuevoServicio.getServiceId())).body(nuevoServicio);
     }
 
-            
     @PutMapping("/{id}")
-    public ResponseEntity<Servicio> actualizarServicio(@PathVariable String id, @RequestBody Servicio detallesServicio) {
-        Servicio servicioActualizado = servicioService.actualizarServicio(id, detallesServicio);
-        if (servicioActualizado != null) {
-            return ResponseEntity.ok(servicioActualizado);
-        } else {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<Servicio> actualizarServicio(@PathVariable String id,
+            @RequestBody Servicio detallesServicio) {
+        // Validar detallesServicio antes de actualizar
+        if (detallesServicio.getName() == null || detallesServicio.getName().isEmpty()) {
+            return ResponseEntity.badRequest().body(null);
         }
+        Servicio servicioActualizado = servicioService.actualizarServicio(id, detallesServicio);
+        return servicioActualizado != null ? ResponseEntity.ok(servicioActualizado) : ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{id}")
