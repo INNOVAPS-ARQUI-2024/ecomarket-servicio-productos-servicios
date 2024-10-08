@@ -26,27 +26,29 @@ public class DBInitializer implements CommandLineRunner {
         
         // Inicializar Productos
         if (productoRepository.count() == 0) {
-            Producto producto1 = new Producto();
-            producto1.setName("Producto 1");
-            producto1.setDescription("Descripción del producto 1");
-            producto1.setPrice(50.25);
-            producto1.setCurrency("USD");
-            producto1.setCategory("Categoría 1");
-            producto1.setStock(100);
-            producto1.setSellerId("user1");
-            producto1.setReviews(Arrays.asList("review1"));
-            producto1.setCreatedAt(new Date());
+            Producto producto1 = Producto.builder()
+                    .name("Producto 1")
+                    .description("Descripción del producto 1")
+                    .price(50.25)
+                    .currency("USD")
+                    .category("Categoría 1")
+                    .stock(100)
+                    .sellerId("user1")
+                    .reviews(Arrays.asList("review1"))
+                    .createdAt(new Date())
+                    .build();
 
-            Producto producto2 = new Producto();
-            producto2.setName("Producto 2");
-            producto2.setDescription("Descripción del producto 2");
-            producto2.setPrice(75.00);
-            producto2.setCurrency("USD");
-            producto2.setCategory("Categoría 2");
-            producto2.setStock(150);
-            producto2.setSellerId("user2");
-            producto2.setReviews(Arrays.asList("review2"));
-            producto2.setCreatedAt(new Date());
+            Producto producto2 = Producto.builder()
+                    .name("Producto 2")
+                    .description("Descripción del producto 2")
+                    .price(75.00)
+                    .currency("USD")
+                    .category("Categoría 2")
+                    .stock(150)
+                    .sellerId("user2")
+                    .reviews(Arrays.asList("review2"))
+                    .createdAt(new Date())
+                    .build();
 
             productoRepository.save(producto1);
             productoRepository.save(producto2);
@@ -54,27 +56,31 @@ public class DBInitializer implements CommandLineRunner {
 
         // Inicializar Servicios
         if (servicioRepository.count() == 0) {
-            Servicio servicio1 = new Servicio();
-            servicio1.setName("Servicio 1");
-            servicio1.setDescription("Descripción del servicio 1");
-            servicio1.setPrice(100.00);
-            servicio1.setCategory("Categoría A");
-            servicio1.setProviderId("user1");
-            servicio1.setAvailability("Disponible");
-            servicio1.setReviews(Arrays.asList("review1"));
-            servicio1.setCreatedAt(new Date());
-            servicio1.setUpdatedAt(new Date());
+            Servicio servicio1 = Servicio.builder()
+                    .name("Servicio 1")
+                    .description("Descripción del servicio 1")
+                    .price(100.00)
+                    .category("Categoría A")
+                    .providerId("user1")
+                    .availability("Disponible")
+                    .reviews(Arrays.asList("review1"))
+                    .createdAt(new Date())
+                    .updatedAt(new Date())
+                    .build();
 
-            Servicio servicio2 = new Servicio();
-            servicio2.setName("Servicio 2");
-            servicio2.setDescription("Descripción del servicio 2");
-            servicio2.setPrice(200.00);
-            servicio2.setCategory("Categoría B");
-            servicio2.setProviderId("user2");
-            servicio2.setAvailability("No disponible");
-            servicio2.setReviews(Arrays.asList("review2"));
-            servicio2.setCreatedAt(new Date());
-            servicio2.setUpdatedAt(new Date());
+
+            Servicio servicio2 = Servicio.builder()
+                    .name("Servicio 2")
+                    .description("Descripción del servicio 2")
+                    .price(200.00)
+                    .category("Categoría B")
+                    .providerId("user2")
+                    .availability("No disponible")
+                    .reviews(Arrays.asList("review2"))
+                    .createdAt(new Date())
+                    .updatedAt(new Date())
+                    .build();
+
 
             servicioRepository.save(servicio1);
             servicioRepository.save(servicio2);
