@@ -18,18 +18,18 @@ import com.example.ecomarket_servicio_productos_servicios.entity.Servicio;
 import com.example.ecomarket_servicio_productos_servicios.service.ServicioService;
 
 @RestController
-@RequestMapping("/servicios")
+@RequestMapping("/ecomarket-servicios")
 public class ServicioController {
     
     @Autowired
     private ServicioService servicioService;
 
-    @GetMapping
+    @GetMapping("/servicios")
     public List<Servicio> obtenerServicios() {
         return servicioService.obtenerServicios();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/servicios/{id}")
     public ResponseEntity<Servicio> obtenerServicioPorId(@PathVariable("id") String id) {
         Servicio servicio = servicioService.obtenerServicioPorId(id);
         if (servicio != null) {
@@ -39,13 +39,13 @@ public class ServicioController {
         }
     }
 
-    @PostMapping
+    @PostMapping("/servicio")
     public ResponseEntity<Servicio> crearServicio(@RequestBody Servicio servicio) {
         Servicio nuevoServicio = servicioService.guardarServicio(servicio);
         return ResponseEntity.created(URI.create("/api/servicios/" + nuevoServicio.getServiceId())).body(nuevoServicio);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("servicios/{id}")
     public ResponseEntity<Servicio> actualizarServicio(@PathVariable("id") String id,
             @RequestBody Servicio detallesServicio) {
         // Validar detallesServicio antes de actualizar
@@ -56,7 +56,7 @@ public class ServicioController {
         return servicioActualizado != null ? ResponseEntity.ok(servicioActualizado) : ResponseEntity.notFound().build();
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("servicios/{id}")
     public ResponseEntity<Void> eliminarServicio(@PathVariable("id") String id) {
         boolean fueEliminado = servicioService.eliminarServicio(id);
         if (fueEliminado) {

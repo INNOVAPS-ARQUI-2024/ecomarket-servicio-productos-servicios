@@ -56,7 +56,7 @@ public class ProductoService {
         return false;
     }
 
-    // Método para obtener productos por sellerId
+    // Metodo para obtener productos por sellerId
     public List<Producto> obtenerProductosPorUsuario(String sellerId) {
         return productoRepository.findBySellerId(sellerId);
     }
