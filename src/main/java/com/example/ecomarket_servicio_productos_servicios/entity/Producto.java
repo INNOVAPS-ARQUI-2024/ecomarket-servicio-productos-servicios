@@ -1,8 +1,9 @@
-package com.example.ecomarket_servicio_productos_servicios.model;
+package com.example.ecomarket_servicio_productos_servicios.entity;
 
 import java.util.Date;
 import java.util.List;
 
+import lombok.Builder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -10,6 +11,7 @@ import lombok.Data;
 
 @Data
 @Document(collection = "productos")
+@Builder
 public class Producto {
 
     @Id

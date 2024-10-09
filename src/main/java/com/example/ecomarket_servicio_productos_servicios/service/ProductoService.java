@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.example.ecomarket_servicio_productos_servicios.model.Producto;
+import com.example.ecomarket_servicio_productos_servicios.entity.Producto;
 import com.example.ecomarket_servicio_productos_servicios.repository.ProductoRepository;
 
 @Service
@@ -24,21 +24,25 @@ public class ProductoService {
     }
 
     public Producto guardarProducto(Producto producto) {
-        producto.setCreatedAt(new Date()); // Asigna la fecha de creación
+        if (producto.getName() == null || producto.getPrice() <= 0 || producto.getCategory() == null) {
+            throw new IllegalArgumentException("Los campos 'nombre', 'precio', y 'categoría' son obligatorios.");
+        }
+        producto.setCreatedAt(new Date());
         return productoRepository.save(producto);
     }
 
     public Producto actualizarProducto(String id, Producto detallesProducto) {
         Producto producto = productoRepository.findById(id).orElse(null);
         if (producto != null) {
+            if (detallesProducto.getName() == null || detallesProducto.getPrice() <= 0
+                    || detallesProducto.getCategory() == null) {
+                throw new IllegalArgumentException("Los campos 'nombre', 'precio', y 'categoría' son obligatorios.");
+            }
             producto.setName(detallesProducto.getName());
             producto.setDescription(detallesProducto.getDescription());
             producto.setPrice(detallesProducto.getPrice());
-            producto.setCurrency(detallesProducto.getCurrency());
             producto.setCategory(detallesProducto.getCategory());
             producto.setStock(detallesProducto.getStock());
-            producto.setSellerId(detallesProducto.getSellerId());
-            producto.setReviews(detallesProducto.getReviews());
             return productoRepository.save(producto);
         }
         return null;
@@ -51,4 +55,10 @@ public class ProductoService {
         }
         return false;
     }
+
+    // Metodo para obtener productos por sellerId
+    public List<Producto> obtenerProductosPorUsuario(String sellerId) {
+        return productoRepository.findBySellerId(sellerId);
+    }
+
 }
