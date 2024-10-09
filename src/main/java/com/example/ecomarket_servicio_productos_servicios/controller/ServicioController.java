@@ -18,7 +18,7 @@ import com.example.ecomarket_servicio_productos_servicios.entity.Servicio;
 import com.example.ecomarket_servicio_productos_servicios.service.ServicioService;
 
 @RestController
-@RequestMapping("/servicios")
+@RequestMapping("/api/servicios")
 public class ServicioController {
     
     @Autowired
