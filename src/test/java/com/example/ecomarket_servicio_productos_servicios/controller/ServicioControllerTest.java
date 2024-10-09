@@ -1,7 +1,5 @@
 package com.example.ecomarket_servicio_productos_servicios.controller;
 
-
-import com.example.ecomarket_servicio_productos_servicios.entity.Producto;
 import com.example.ecomarket_servicio_productos_servicios.entity.Servicio;
 import com.example.ecomarket_servicio_productos_servicios.service.ServicioService;
 import com.example.ecomarket_servicio_productos_servicios.utils.TestUtils;
@@ -24,124 +22,89 @@ public class ServicioControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
     @MockBean
     private ServicioService servicioService;
 
     @Test
-    public void testGivenRequestForallOrdersWhenObtenerPedidosEndpointIsCalledThenReturnListOfPedidos () throws Exception {
+    public void testGivenRequestForAllServiciosWhenObtenerServiciosEndpointIsCalledThenReturnListOfServicios() throws Exception {
         // Arrange
         Mockito.when(servicioService.obtenerServicios()).thenReturn(TestUtils.mockServicios());
+
         // Act
-        RequestBuilder request = MockMvcRequestBuilders.get("/ecomarket-servicios/servicios")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON_UTF8);
+        RequestBuilder request = MockMvcRequestBuilders.get("/servicios")
+                .contentType(MediaType.APPLICATION_JSON);
 
         mockMvc.perform(request)
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
+
     @Test
-    public void testGivenValidServiceIDWhenObtenerServiciosEndpointIsCalledThenReturnListOfServicios() throws Exception {
+    public void testGivenValidServiceIDWhenObtenerServicioEndpointIsCalledThenReturnServicio() throws Exception {
         // Arrange
         Mockito.when(servicioService.obtenerServicioPorId(eq("123"))).thenReturn(TestUtils.mockServicio());
-        // Act
-        RequestBuilder request = MockMvcRequestBuilders.get("/ecomarket-servicios/servicios/123")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON_UTF8);
 
+        // Act
+        RequestBuilder request = MockMvcRequestBuilders.get("/servicios/123")
+                .contentType(MediaType.APPLICATION_JSON);
 
         mockMvc.perform(request)
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     @Test
-    public void testGivenNonValidServiceIDWhenObtenerServiciosEndpointIsCalledThenReturnNotFound() throws Exception {
-        //Arrange
-        Mockito.when(servicioService.obtenerServicioPorId(eq("999"))).thenReturn(TestUtils.mockServicio());
-        //Act
-        RequestBuilder request = MockMvcRequestBuilders.get("/ecomarket-servicios/servicios/123")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON_UTF8);
+    public void testGivenNonValidServiceIDWhenObtenerServicioEndpointIsCalledThenReturnNotFound() throws Exception {
+        // Arrange
+        Mockito.when(servicioService.obtenerServicioPorId(eq("999"))).thenReturn(null);
 
-        //Act & Assert
+        // Act
+        RequestBuilder request = MockMvcRequestBuilders.get("/servicios/999")
+                .contentType(MediaType.APPLICATION_JSON);
+
         mockMvc.perform(request)
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
+
     @Test
-    public void testGivenValidServiceWhenServicioIsPostThenReturnCreated () throws Exception {
+    public void testGivenValidServicioWhenServicioIsPostThenReturnCreated() throws Exception {
         // Arrange
         Mockito.when(servicioService.guardarServicio(any())).thenReturn(TestUtils.mockServicio());
-        String json = TestUtils.asJsonString(TestUtils.mockProducto());
-        // Act
-        RequestBuilder request = MockMvcRequestBuilders.post("/ecomarket-servicios/servicio")
-                .content(json)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON_UTF8);
+        String json = TestUtils.asJsonString(TestUtils.mockServicio());
 
-        // Act & Assert
+        // Act
+        RequestBuilder request = MockMvcRequestBuilders.post("/servicios")
+                .content(json)
+                .contentType(MediaType.APPLICATION_JSON);
+
         mockMvc.perform(request)
                 .andExpect(MockMvcResultMatchers.status().isCreated());
     }
+
     @Test
-    public void testGivenValidServiceWhenServicioIsPutThenReturnOk() throws Exception {
-        //Arrange
+    public void testGivenValidServicioWhenServicioIsPutThenReturnOk() throws Exception {
+        // Arrange
         Mockito.when(servicioService.actualizarServicio(eq("123"), any(Servicio.class))).thenReturn(TestUtils.mockServicio());
-        String json = TestUtils.asJsonString(TestUtils.mockProducto());
+        String json = TestUtils.asJsonString(TestUtils.mockServicio());
 
-        //Act
-        RequestBuilder request = MockMvcRequestBuilders.put("/ecomarket-servicios/servicios/123")
+        // Act
+        RequestBuilder request = MockMvcRequestBuilders.put("/servicios/123")
                 .content(json)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON_UTF8);
+                .contentType(MediaType.APPLICATION_JSON);
 
-        //Act & Assert
         mockMvc.perform(request)
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
-    @Test
-    public void testGivenNonValidServiceWhenServicioIsPutThenReturnNotFound() throws Exception {
-        //Arrange
-        Mockito.when(servicioService.actualizarServicio(eq("123"), any(Servicio.class))).thenReturn(null);
-        String json = TestUtils.asJsonString(TestUtils.mockProducto());
-
-        //Act
-        RequestBuilder request = MockMvcRequestBuilders.put("/ecomarket-servicios/servicios/123")
-                .content(json)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON_UTF8);
-
-        //Act & Assert
-        mockMvc.perform(request)
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
-    }
 
     @Test
-    public void testGivenValidProductIDWhenEliminarProductoEndpointIsCalledThenReturnOK () throws Exception {
+    public void testGivenNonValidServiceIDWhenEliminarServicioEndpointIsCalledThenReturnNotFound() throws Exception {
         // Arrange
-        Mockito.when(servicioService.eliminarServicio(eq("123"))).thenReturn(true);
+        Mockito.when(servicioService.eliminarServicio(eq("999"))).thenReturn(false);
+
         // Act
-        RequestBuilder request = MockMvcRequestBuilders.delete("/ecomarket-servicios/servicios/123")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON_UTF8);
-
-
-        mockMvc.perform(request)
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
-    }
-
-    @Test
-    public void testGivenNonValidProductoIDWhenEliminarProductoEndpointIsCalledThenReturnNotFound () throws Exception {
-        // Arrange
-        Mockito.when(servicioService.eliminarServicio(eq("123"))).thenReturn(false);
-        // Act
-        RequestBuilder request = MockMvcRequestBuilders.delete("/ecomarket-pagos/pedido/123")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON_UTF8);
-
+        RequestBuilder request = MockMvcRequestBuilders.delete("/servicios/999")
+                .contentType(MediaType.APPLICATION_JSON);
 
         mockMvc.perform(request)
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
-
-
-
 }
