@@ -17,24 +17,24 @@ import com.example.ecomarket_servicio_productos_servicios.entity.Producto;
 import com.example.ecomarket_servicio_productos_servicios.service.ProductoService;
 
 @RestController
-@RequestMapping("/ecomarket-productos")
+@RequestMapping("/productos")
 public class ProductoController {
 
     @Autowired
     private ProductoService productoService;
 
-    @GetMapping("/productos")
+    @GetMapping
     public List<Producto> obtenerProductos() {
         return productoService.obtenerProductos();
     }
 
-    @GetMapping("/productos/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Producto> obtenerProductoPorId(@PathVariable("id") String id) {
         Producto producto = productoService.obtenerProductoPorId(id);
         return producto != null ? ResponseEntity.ok(producto) : ResponseEntity.notFound().build();
     }
 
-    @PostMapping("/producto")
+    @PostMapping
     public ResponseEntity<Producto> crearProducto(@RequestBody Producto producto) {
         try {
             Producto nuevoProducto = productoService.guardarProducto(producto);
@@ -44,7 +44,7 @@ public class ProductoController {
         }
     }
 
-    @PutMapping("/productos/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Producto> actualizarProducto(@PathVariable("id") String id,
             @RequestBody Producto detallesProducto) {
         try {
@@ -56,7 +56,7 @@ public class ProductoController {
         }
     }
 
-    @DeleteMapping("/productos/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarProducto(@PathVariable("id") String id) {
         boolean fueEliminado = productoService.eliminarProducto(id);
         return fueEliminado ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
