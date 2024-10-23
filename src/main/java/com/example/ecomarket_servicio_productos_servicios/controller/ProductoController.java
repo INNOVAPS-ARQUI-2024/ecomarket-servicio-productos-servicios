@@ -3,6 +3,7 @@ package com.example.ecomarket_servicio_productos_servicios.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -98,5 +99,16 @@ public class ProductoController {
     public ResponseEntity<List<Producto>> obtenerProductosPorUsuario(@PathVariable("sellerId") String sellerId) {
         List<Producto> productos = productoService.obtenerProductosPorUsuario(sellerId);
         return ResponseEntity.ok(productos);
+    }
+    
+    @GetMapping("/categoria/{categoria}")
+    public List<Producto> obtenerProductosPorCategoria(@PathVariable("categoria") String categoria) {
+        return productoService.getProductosPorCategoria(categoria);
+    }
+
+    @GetMapping("/mas-vendidos")
+    public ResponseEntity<List<Producto>> getProductosMasVendidos() {
+        List<Producto> productosMasVendidos = productoService.getProductosMasVendidos();
+        return new ResponseEntity<>(productosMasVendidos, HttpStatus.OK);
     }
 }
