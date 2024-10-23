@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.ecomarket_servicio_productos_servicios.entity.Producto;
 import com.example.ecomarket_servicio_productos_servicios.service.ProductoService;
@@ -35,9 +37,26 @@ public class ProductoController {
     }
 
     @PostMapping
-    public ResponseEntity<Producto> crearProducto(@RequestBody Producto producto) {
+    public ResponseEntity<Producto> crearProducto(@RequestParam("name") String name,
+            @RequestParam("description") String description,
+            @RequestParam("price") double price,
+            @RequestParam("currency") String currency,
+            @RequestParam("category") String category,
+            @RequestParam("stock") int stock,
+            @RequestParam("sellerId") String sellerId,
+            @RequestParam(value = "picture", required = false) MultipartFile picture) {
         try {
-            Producto nuevoProducto = productoService.guardarProducto(producto);
+            Producto producto = new Producto();
+            producto.setName(name);
+            producto.setDescription(description);
+            producto.setPrice(price);
+            producto.setCurrency(currency);
+            producto.setCategory(category);
+            producto.setStock(stock);
+            producto.setSellerId(sellerId);
+
+            // Ahora pasamos el producto y la imagen al servicio
+            Producto nuevoProducto = productoService.guardarProducto(producto, picture);
             return ResponseEntity.status(201).body(nuevoProducto);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(400).body(null); // Solicitud incorrecta
@@ -46,11 +65,24 @@ public class ProductoController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Producto> actualizarProducto(@PathVariable("id") String id,
-            @RequestBody Producto detallesProducto) {
+            @RequestParam("name") String name,
+            @RequestParam("description") String description,
+            @RequestParam("price") double price,
+            @RequestParam("currency") String currency,
+            @RequestParam("category") String category,
+            @RequestParam("stock") int stock,
+            @RequestParam(value = "picture", required = false) MultipartFile picture) {
         try {
-            Producto productoActualizado = productoService.actualizarProducto(id, detallesProducto);
-            return productoActualizado != null ? ResponseEntity.ok(productoActualizado)
-                    : ResponseEntity.notFound().build();
+            Producto detallesProducto = new Producto();
+            detallesProducto.setName(name);
+            detallesProducto.setDescription(description);
+            detallesProducto.setPrice(price);
+            detallesProducto.setCurrency(currency);
+            detallesProducto.setCategory(category);
+            detallesProducto.setStock(stock);
+
+            Producto productoActualizado = productoService.actualizarProducto(id, detallesProducto, picture);
+            return productoActualizado != null ? ResponseEntity.ok(productoActualizado) : ResponseEntity.notFound().build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(400).body(null); // Solicitud incorrecta
         }
