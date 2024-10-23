@@ -3,7 +3,6 @@ package com.example.ecomarket_servicio_productos_servicios.entity;
 import java.util.Date;
 import java.util.List;
 
-import lombok.Builder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -11,7 +10,6 @@ import lombok.Data;
 
 @Data
 @Document(collection = "productos")
-@Builder
 public class Producto {
 
     @Id
@@ -25,4 +23,7 @@ public class Producto {
     private String sellerId; // userId
     private List<String> reviews; // array de reviewIds
     private Date createdAt; // fecha de creación
+    private byte[] picture; // Campo para almacenar la imagen
+    private long sold; // Número de unidades vendidas
+    
 }
