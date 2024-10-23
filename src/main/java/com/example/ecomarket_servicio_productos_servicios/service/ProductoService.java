@@ -84,4 +84,12 @@ public class ProductoService {
         return productoRepository.findBySellerId(sellerId);
     }
 
+    public List<Producto> getProductosPorCategoria(String category) {
+        return productoRepository.findByCategory(category);
+    }
+
+    public List<Producto> getProductosMasVendidos() {
+        // Aquí puedes usar tu lógica para obtener los productos más vendidos
+        return productoRepository.findTop10ByOrderBySold();
+    }
 }
