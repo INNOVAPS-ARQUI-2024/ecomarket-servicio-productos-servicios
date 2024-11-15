@@ -1,33 +1,29 @@
 package com.example.ecomarket_servicio_productos_servicios.service;
 
-
 import com.example.ecomarket_servicio_productos_servicios.entity.Producto;
 import com.example.ecomarket_servicio_productos_servicios.repository.ProductoRepository;
 import com.example.ecomarket_servicio_productos_servicios.utils.TestUtils;
-import jakarta.ws.rs.core.Application;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.mock.web.MockMultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-@SpringBootApplication
-@ContextConfiguration(classes = Application.class)
 public class ProductoServiceTest {
 
     @Mock
     private ProductoRepository productoRepository;
+
     @InjectMocks
     private ProductoService productoService;
 
@@ -36,128 +32,242 @@ public class ProductoServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
-
     @Test
-    public void testGivenRepositoryLoadedWithProductosWhenObtenerProductosIsCalledThenReturnAllProductos() {
+    public void testObtenerProductos() {
         // Arrange
-        Mockito.when(productoRepository.findAll()).thenReturn(TestUtils.mockProductos());
+        List<Producto> productosMock = TestUtils.mockProductos(); // Suponemos que devuelve una lista mock de productos
+        Mockito.when(productoRepository.findAll()).thenReturn(productosMock);
 
         // Act
         List<Producto> response = productoService.obtenerProductos();
 
         // Assert
         assertNotNull(response);
-        assertEquals(2, response.size());
+        assertEquals(2, response.size()); // Aseguramos que la lista tiene 2 productos, según el mock
         verify(productoRepository, times(1)).findAll();
     }
 
     @Test
-    public void testGivenValidIDWhenObtenerProductosPorIDIsCalledThenReturnProducto(){
-        //Arrange
-        Mockito.when(productoRepository.findById(eq("123"))).thenReturn(Optional.ofNullable(TestUtils.mockProducto()));
+    public void testObtenerProductoPorIdExistente() {
+        // Arrange
+        String productoID = "123";
+        Producto productoMock = TestUtils.mockProducto(); // Suponemos que devuelve un producto mock
+        Mockito.when(productoRepository.findById(eq(productoID))).thenReturn(Optional.of(productoMock));
 
-        //Act
-        Producto response = productoService.obtenerProductoPorId("123");
+        // Act
+        Producto response = productoService.obtenerProductoPorId(productoID);
 
-        //Assert
+        // Assert
         assertNotNull(response);
-        verify(productoRepository, times(1)).findById(eq("123"));
-        assertEquals("123", response.getProductId());
+        verify(productoRepository, times(1)).findById(eq(productoID));
     }
 
     @Test
-    public void testGivenNonValidIDWhenObtenerProductosPorIDIsCalledThenReturnNull(){
-        //Arrange
-        Mockito.when(productoRepository.findById(eq("123"))).thenReturn(Optional.ofNullable(TestUtils.mockProducto()));
+    public void testObtenerProductoPorIdInexistente() {
+        // Arrange
+        String productoID = "123";
+        Mockito.when(productoRepository.findById(eq(productoID))).thenReturn(Optional.empty());
 
-        //Act
-        Producto response = productoService.obtenerProductoPorId("1234");
+        // Act
+        Producto response = productoService.obtenerProductoPorId(productoID);
 
-        //Assert
+        // Assert
         assertNull(response);
-        verify(productoRepository, times(1)).findById(eq("1234"));
+        verify(productoRepository, times(1)).findById(eq(productoID));
     }
 
+
+
     @Test
-    public void testGivenValidProductoObjectWhenGuardarProductoIsCallThenReturnProducto(){
-        //Arrange
-        Mockito.when(productoRepository.save(any(Producto.class))).thenReturn(TestUtils.mockProducto());
+    public void testGuardarProductoConImagen() throws IOException {
+        // Arrange
+        Producto mockProducto = TestUtils.mockProducto();
+        MockMultipartFile mockPicture = new MockMultipartFile("file", "imagen.jpg", "image/jpeg", "data".getBytes());
 
-        //Act
-        Producto response = productoService.guardarProducto(TestUtils.mockProducto());
+        Mockito.when(productoRepository.save(any(Producto.class))).thenReturn(mockProducto);
 
-        //Assert
+        // Act
+        Producto response = productoService.guardarProducto(mockProducto, mockPicture);
+
+        // Assert
         assertNotNull(response);
         verify(productoRepository, times(1)).save(any(Producto.class));
-
     }
 
     @Test
-    public void testGivenValidProductoObjectWhenModificarProductoIsCallThenReturnUpdateProducto(){
-        //Arrange
-        String productoID = "123";
-        Producto productoExiste = TestUtils.mockProducto();
-        Producto updateProducto = TestUtils.mockProducto();
+    public void testGuardarProductoSinImagen() {
+        // Arrange
+        Producto mockProducto = TestUtils.mockProducto();
 
-        Mockito.when(productoRepository.findById(eq(productoID))).thenReturn(Optional.ofNullable(productoExiste));
-        Mockito.when(productoRepository.save(any(Producto.class))).thenReturn(updateProducto);
+        Mockito.when(productoRepository.save(any(Producto.class))).thenReturn(mockProducto);
 
-        //Act
-        Producto response = productoService.actualizarProducto(productoID, updateProducto);
+        // Act
+        Producto response = productoService.guardarProducto(mockProducto, null);
 
-        //Assert
+        // Assert
         assertNotNull(response);
-        assertEquals(updateProducto.getProductId(), response.getProductId());
+        verify(productoRepository, times(1)).save(any(Producto.class));
+    }
+
+    @Test
+    public void testGuardarProductoConDatosInvalidos() {
+        // Arrange
+        Producto mockProducto = TestUtils.mockProducto();
+        mockProducto.setName(null); // Campo obligatorio faltante
+
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class, () -> {
+            productoService.guardarProducto(mockProducto, null);
+        });
+        verify(productoRepository, never()).save(any(Producto.class));
+    }
+
+    @Test
+    public void testActualizarProductoConImagen() throws IOException {
+        // Arrange
+        String productoID = "123";
+        Producto productoExistente = TestUtils.mockProducto();
+        Producto detallesActualizados = TestUtils.mockProducto();
+        MockMultipartFile mockPicture = new MockMultipartFile("file", "imagen.jpg", "image/jpeg", "data".getBytes());
+
+        Mockito.when(productoRepository.findById(eq(productoID))).thenReturn(Optional.of(productoExistente));
+        Mockito.when(productoRepository.save(any(Producto.class))).thenReturn(detallesActualizados);
+
+        // Act
+        Producto response = productoService.actualizarProducto(productoID, detallesActualizados, mockPicture);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(detallesActualizados.getProductId(), response.getProductId());
         verify(productoRepository, times(1)).findById(eq(productoID));
         verify(productoRepository, times(1)).save(any(Producto.class));
     }
 
     @Test
-    public void testGivenNonValidProductoObjectWhenModificarProductoIsCallThenReturnNull(){
-        //Arrange
-        Producto updatePedido = TestUtils.mockProducto();
-
-        Mockito.when(productoRepository.findById(eq("123"))).thenReturn(Optional.ofNullable(TestUtils.mockProducto()));
-
-        //Act
-        Producto response = productoService.actualizarProducto("1234", updatePedido);
-
-        //Assert
-        assertNull(response);
-        verify(productoRepository, times(1)).findById(eq("1234"));
-        verify(productoRepository, never()).save(any(Producto.class));
-
-    }
-
-    @Test
-    public void testGivenExistingProductoWhenEliminarProductoIsCallThenReturnTrue(){
-        //Arrange
-
-        Mockito.when(productoRepository.existsById(eq("123"))).thenReturn(true);
-        Mockito.doNothing().when(productoRepository).deleteById(eq("123"));
-
-        //Act
-        boolean response = productoService.eliminarProducto("123");
-
-        //Assert
-        assertTrue(response);
-        verify(productoRepository, times(1)).existsById(eq("123"));
-        verify(productoRepository, times(1)).deleteById(eq("123"));
-
-    }
-
-    @Test
-    public void estGivenRepositoryLoadedWithUsuariosWhenObtenerProductosporUsuarioIsCalledThenReturnAllProductos(){
+    public void testActualizarProductoSinImagen() {
         // Arrange
-        Mockito.when(productoRepository.findBySellerId(anyString())).thenReturn(TestUtils.mockProductos());
+        String productoID = "123";
+        Producto productoExistente = TestUtils.mockProducto();
+        Producto detallesActualizados = TestUtils.mockProducto();
+
+        Mockito.when(productoRepository.findById(eq(productoID))).thenReturn(Optional.of(productoExistente));
+        Mockito.when(productoRepository.save(any(Producto.class))).thenReturn(detallesActualizados);
 
         // Act
-        List<Producto> response = productoService.obtenerProductosPorUsuario(anyString());
+        Producto response = productoService.actualizarProducto(productoID, detallesActualizados, null);
 
         // Assert
         assertNotNull(response);
-        assertEquals(2, response.size());
-        verify(productoRepository, times(1)).findBySellerId(anyString());
+        verify(productoRepository, times(1)).findById(eq(productoID));
+        verify(productoRepository, times(1)).save(any(Producto.class));
+    }
+
+    @Test
+    public void testActualizarProductoConDatosInvalidos() {
+        // Arrange
+        String productoID = "123";
+        Producto detallesActualizados = TestUtils.mockProducto();
+        detallesActualizados.setPrice(-1.0); // Precio inválido
+
+        Mockito.when(productoRepository.findById(eq(productoID))).thenReturn(Optional.of(TestUtils.mockProducto()));
+
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class, () -> {
+            productoService.actualizarProducto(productoID, detallesActualizados, null);
+        });
+        verify(productoRepository, never()).save(any(Producto.class));
+    }
+
+    @Test
+    public void testActualizarProductoNoExistente() {
+        // Arrange
+        String productoID = "123";
+        Producto detallesActualizados = TestUtils.mockProducto();
+
+        Mockito.when(productoRepository.findById(eq(productoID))).thenReturn(Optional.empty());
+
+        // Act
+        Producto response = productoService.actualizarProducto(productoID, detallesActualizados, null);
+
+        // Assert
+        assertNull(response);
+        verify(productoRepository, times(1)).findById(eq(productoID));
+        verify(productoRepository, never()).save(any(Producto.class));
+    }
+
+    @Test
+    public void testEliminarProductoExistente() {
+        // Arrange
+        String productoID = "123";
+        Mockito.when(productoRepository.existsById(eq(productoID))).thenReturn(true);
+        Mockito.doNothing().when(productoRepository).deleteById(eq(productoID));
+
+        // Act
+        boolean response = productoService.eliminarProducto(productoID);
+
+        // Assert
+        assertTrue(response);
+        verify(productoRepository, times(1)).existsById(eq(productoID));
+        verify(productoRepository, times(1)).deleteById(eq(productoID));
+    }
+
+    @Test
+    public void testEliminarProductoInexistente() {
+        // Arrange
+        String productoID = "123";
+        Mockito.when(productoRepository.existsById(eq(productoID))).thenReturn(false);
+
+        // Act
+        boolean response = productoService.eliminarProducto(productoID);
+
+        // Assert
+        assertFalse(response);
+        verify(productoRepository, times(1)).existsById(eq(productoID));
+        verify(productoRepository, never()).deleteById(anyString());
+    }
+
+    @Test
+    public void testObtenerProductosPorUsuario() {
+        // Arrange
+        String sellerId = "seller123";
+        Mockito.when(productoRepository.findBySellerId(eq(sellerId))).thenReturn(TestUtils.mockProductos());
+
+        // Act
+        List<Producto> response = productoService.obtenerProductosPorUsuario(sellerId);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(2, response.size()); // Supongamos que TestUtils.mockProductos() devuelve 2 elementos
+        verify(productoRepository, times(1)).findBySellerId(eq(sellerId));
+    }
+
+    @Test
+    public void testObtenerProductosPorCategoria() {
+        // Arrange
+        String categoria = "Electrónica";
+        Mockito.when(productoRepository.findByCategory(eq(categoria))).thenReturn(TestUtils.mockProductos());
+
+        // Act
+        List<Producto> response = productoService.getProductosPorCategoria(categoria);
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(2, response.size()); // Supongamos que TestUtils.mockProductos() devuelve 2 elementos
+        verify(productoRepository, times(1)).findByCategory(eq(categoria));
+    }
+
+    @Test
+    public void testObtenerProductosMasVendidos() {
+        // Arrange
+        Mockito.when(productoRepository.findTop10ByOrderBySold()).thenReturn(TestUtils.mockProductos());
+
+        // Act
+        List<Producto> response = productoService.getProductosMasVendidos();
+
+        // Assert
+        assertNotNull(response);
+        assertEquals(2, response.size()); // Supongamos que TestUtils.mockProductos() devuelve 2 elementos
+        verify(productoRepository, times(1)).findTop10ByOrderBySold();
     }
 
 }

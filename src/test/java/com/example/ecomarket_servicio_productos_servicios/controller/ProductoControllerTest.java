@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -29,12 +30,10 @@ public class ProductoControllerTest {
     private ProductoService productoService;
 
     @Test
-    public void testGivenRequestForAllProductosWhenObtenerProductoEndpointIsCalledThenReturnListOfProductos() throws Exception {
-        // Arrange
+    public void testObtenerProductos() throws Exception {
         Mockito.when(productoService.obtenerProductos()).thenReturn(TestUtils.mockProductos());
 
-        // Act
-        RequestBuilder request = MockMvcRequestBuilders.get("/productos")
+        RequestBuilder request = MockMvcRequestBuilders.get("/api/productos")
                 .contentType(MediaType.APPLICATION_JSON);
 
         mockMvc.perform(request)
@@ -42,12 +41,10 @@ public class ProductoControllerTest {
     }
 
     @Test
-    public void testGivenValidProductoIDWhenObtenerProductoEndpointIsCalledThenReturnProducto() throws Exception {
-        // Arrange
+    public void testObtenerProductoPorId() throws Exception {
         Mockito.when(productoService.obtenerProductoPorId(eq("123"))).thenReturn(TestUtils.mockProducto());
 
-        // Act
-        RequestBuilder request = MockMvcRequestBuilders.get("/productos/123")
+        RequestBuilder request = MockMvcRequestBuilders.get("/api/productos/123")
                 .contentType(MediaType.APPLICATION_JSON);
 
         mockMvc.perform(request)
@@ -55,70 +52,89 @@ public class ProductoControllerTest {
     }
 
     @Test
-    public void testGivenNonValidProductoIDWhenObtenerProductoEndpointIsCalledThenReturnNotFound() throws Exception {
-        // Arrange
-        Mockito.when(productoService.obtenerProductoPorId(eq("999"))).thenReturn(null);
+    public void testCrearProducto() throws Exception {
+        MockMultipartFile picture = new MockMultipartFile("picture", "image.jpg", "image/jpeg", "sample image content".getBytes());
+        Mockito.when(productoService.guardarProducto(any(Producto.class), any())).thenReturn(TestUtils.mockProducto());
 
-        // Act
-        RequestBuilder request = MockMvcRequestBuilders.get("/productos/999")
-                .contentType(MediaType.APPLICATION_JSON);
+        RequestBuilder request = MockMvcRequestBuilders.multipart("/api/productos")
+                .file(picture)
+                .param("name", "Producto 1")
+                .param("description", "Descripción del producto")
+                .param("price", "99.99")
+                .param("currency", "USD")
+                .param("category", "Tecnología")
+                .param("stock", "10")
+                .param("sellerId", "seller123")
+                .contentType(MediaType.MULTIPART_FORM_DATA);
 
         mockMvc.perform(request)
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Producto 1"));
     }
 
     @Test
-    public void testGivenValidProductoWhenProductoIsPostThenReturnCreated() throws Exception {
-        // Arrange
-        Mockito.when(productoService.guardarProducto(any())).thenReturn(TestUtils.mockProducto());
-        String json = TestUtils.asJsonString(TestUtils.mockProducto());
+    public void testActualizarProducto() throws Exception {
+        MockMultipartFile picture = new MockMultipartFile("picture", "image.jpg", "image/jpeg", "updated image content".getBytes());
+        Mockito.when(productoService.actualizarProducto(eq("123"), any(Producto.class), any())).thenReturn(TestUtils.mockProducto());
 
-        // Act
-        RequestBuilder request = MockMvcRequestBuilders.post("/productos")
-                .content(json)
-                .contentType(MediaType.APPLICATION_JSON);
-
-        mockMvc.perform(request)
-                .andExpect(MockMvcResultMatchers.status().isCreated());
-    }
-
-    @Test
-    public void testGivenValidProductoWhenProductoIsPutThenReturnOk() throws Exception {
-        // Arrange
-        Mockito.when(productoService.actualizarProducto(eq("123"), any(Producto.class))).thenReturn(TestUtils.mockProducto());
-        String json = TestUtils.asJsonString(TestUtils.mockProducto());
-
-        // Act
-        RequestBuilder request = MockMvcRequestBuilders.put("/productos/123")
-                .content(json)
-                .contentType(MediaType.APPLICATION_JSON);
+        RequestBuilder request = MockMvcRequestBuilders.multipart("/api/productos/123")
+                .file(picture)
+                .param("name", "Producto actualizado")
+                .param("description", "Descripción actualizada")
+                .param("price", "150.00")
+                .param("currency", "USD")
+                .param("category", "Hogar")
+                .param("stock", "20")
+                .with(requestPostProcessor -> {
+                    requestPostProcessor.setMethod("PUT");
+                    return requestPostProcessor;
+                })
+                .contentType(MediaType.MULTIPART_FORM_DATA);
 
         mockMvc.perform(request)
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     @Test
-    public void testGivenNonValidProductoIDWhenEliminarProductoEndpointIsCalledThenReturnNotFound() throws Exception {
-        // Arrange
-        Mockito.when(productoService.eliminarProducto(eq("999"))).thenReturn(false);
+    public void testEliminarProducto() throws Exception {
+        Mockito.when(productoService.eliminarProducto(eq("123"))).thenReturn(true);
 
-        // Act
-        RequestBuilder request = MockMvcRequestBuilders.delete("/productos/999")
+        RequestBuilder request = MockMvcRequestBuilders.delete("/api/productos/123")
                 .contentType(MediaType.APPLICATION_JSON);
 
         mockMvc.perform(request)
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
     }
 
     @Test
-    public void testGivenProductosWhenObtenerProductosPorUsuarioIsCalledThenReturnOk() throws Exception {
-        // Arrange
+    public void testObtenerProductosPorUsuario() throws Exception {
         String sellerId = "user1";
-        List<Producto> productos = TestUtils.mockProductos();
-        Mockito.when(productoService.obtenerProductosPorUsuario(sellerId)).thenReturn(productos);
+        Mockito.when(productoService.obtenerProductosPorUsuario(eq(sellerId))).thenReturn(TestUtils.mockProductos());
 
-        // Act
-        RequestBuilder request = MockMvcRequestBuilders.get("/productos/usuario/{sellerId}", sellerId)
+        RequestBuilder request = MockMvcRequestBuilders.get("/api/productos/usuario/{sellerId}", sellerId)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(request)
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    public void testObtenerProductosPorCategoria() throws Exception {
+        String categoria = "Tecnología";
+        Mockito.when(productoService.getProductosPorCategoria(eq(categoria))).thenReturn(TestUtils.mockProductos());
+
+        RequestBuilder request = MockMvcRequestBuilders.get("/api/productos/categoria/{categoria}", categoria)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(request)
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    public void testObtenerProductosMasVendidos() throws Exception {
+        Mockito.when(productoService.getProductosMasVendidos()).thenReturn(TestUtils.mockProductos());
+
+        RequestBuilder request = MockMvcRequestBuilders.get("/api/productos/mas-vendidos")
                 .contentType(MediaType.APPLICATION_JSON);
 
         mockMvc.perform(request)

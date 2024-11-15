@@ -1,11 +1,15 @@
 package com.example.ecomarket_servicio_productos_servicios.init;
 
+import com.example.ecomarket_servicio_productos_servicios.entity.Producto;
+import com.example.ecomarket_servicio_productos_servicios.entity.Servicio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import com.example.ecomarket_servicio_productos_servicios.repository.ProductoRepository;
 import com.example.ecomarket_servicio_productos_servicios.repository.ServicioRepository;
+
+import java.util.*;
 
 @Component
 public class DBInitializer implements CommandLineRunner {
@@ -18,7 +22,7 @@ public class DBInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        /*
+
         // Inicializar Productos
         if (productoRepository.count() == 0) {
             Producto producto1 = Producto.builder()
@@ -79,7 +83,7 @@ public class DBInitializer implements CommandLineRunner {
 
             servicioRepository.save(servicio1);
             servicioRepository.save(servicio2);
-        }*/
+        }
         System.out.println("Datos iniciales cargados en la base de datos.");
     }
 }

@@ -14,6 +14,8 @@ import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.util.*;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 
@@ -29,14 +31,25 @@ public class ServicioControllerTest {
     @Test
     public void testGivenRequestForAllServiciosWhenObtenerServiciosEndpointIsCalledThenReturnListOfServicios() throws Exception {
         // Arrange
-        Mockito.when(servicioService.obtenerServicios()).thenReturn(TestUtils.mockServicios());
+        List<Servicio> mockServicios = TestUtils.mockServicios();
+        Mockito.when(servicioService.obtenerServicios()).thenReturn(mockServicios);
 
         // Act
-        RequestBuilder request = MockMvcRequestBuilders.get("/servicios")
+        RequestBuilder request = MockMvcRequestBuilders.get("/api/servicios")
                 .contentType(MediaType.APPLICATION_JSON);
 
+        // Assert
         mockMvc.perform(request)
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(mockServicios.size()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].serviceId").value(mockServicios.get(0).getServiceId()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].name").value(mockServicios.get(0).getName()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].price").value(mockServicios.get(0).getPrice()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].category").value(mockServicios.get(0).getCategory()));
+
+        // Verificar que el servicio fue llamado una vez
+        Mockito.verify(servicioService, Mockito.times(1)).obtenerServicios();
     }
 
     @Test
@@ -45,7 +58,7 @@ public class ServicioControllerTest {
         Mockito.when(servicioService.obtenerServicioPorId(eq("123"))).thenReturn(TestUtils.mockServicio());
 
         // Act
-        RequestBuilder request = MockMvcRequestBuilders.get("/servicios/123")
+        RequestBuilder request = MockMvcRequestBuilders.get("/api/servicios/123")
                 .contentType(MediaType.APPLICATION_JSON);
 
         mockMvc.perform(request)
@@ -58,7 +71,7 @@ public class ServicioControllerTest {
         Mockito.when(servicioService.obtenerServicioPorId(eq("999"))).thenReturn(null);
 
         // Act
-        RequestBuilder request = MockMvcRequestBuilders.get("/servicios/999")
+        RequestBuilder request = MockMvcRequestBuilders.get("/api/servicios/999")
                 .contentType(MediaType.APPLICATION_JSON);
 
         mockMvc.perform(request)
@@ -72,7 +85,7 @@ public class ServicioControllerTest {
         String json = TestUtils.asJsonString(TestUtils.mockServicio());
 
         // Act
-        RequestBuilder request = MockMvcRequestBuilders.post("/servicios")
+        RequestBuilder request = MockMvcRequestBuilders.post("/api/servicios")
                 .content(json)
                 .contentType(MediaType.APPLICATION_JSON);
 
@@ -87,7 +100,7 @@ public class ServicioControllerTest {
         String json = TestUtils.asJsonString(TestUtils.mockServicio());
 
         // Act
-        RequestBuilder request = MockMvcRequestBuilders.put("/servicios/123")
+        RequestBuilder request = MockMvcRequestBuilders.put("/api/servicios/123")
                 .content(json)
                 .contentType(MediaType.APPLICATION_JSON);
 
@@ -101,7 +114,7 @@ public class ServicioControllerTest {
         Mockito.when(servicioService.eliminarServicio(eq("999"))).thenReturn(false);
 
         // Act
-        RequestBuilder request = MockMvcRequestBuilders.delete("/servicios/999")
+        RequestBuilder request = MockMvcRequestBuilders.delete("/api/servicios/999")
                 .contentType(MediaType.APPLICATION_JSON);
 
         mockMvc.perform(request)
