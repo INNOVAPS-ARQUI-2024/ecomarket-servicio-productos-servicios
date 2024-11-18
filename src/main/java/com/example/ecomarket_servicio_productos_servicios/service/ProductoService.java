@@ -5,6 +5,9 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,12 +20,12 @@ public class ProductoService {
     @Autowired
     private ProductoRepository productoRepository;
 
-    public List<Producto> obtenerProductos() {
-        return productoRepository.findAll();
-    }
-
     public Producto obtenerProductoPorId(String id) {
         return productoRepository.findById(id).orElse(null);
+    }
+
+    public List<Producto> obtenerProductos(){
+        return productoRepository.findAll();
     }
 
     public Producto guardarProducto(Producto producto, MultipartFile picture) {
@@ -90,6 +93,6 @@ public class ProductoService {
 
     public List<Producto> getProductosMasVendidos() {
         // Aquí puedes usar tu lógica para obtener los productos más vendidos
-        return productoRepository.findTop10ByOrderBySold();
+        return productoRepository.findTop10ByOrderBySoldDesc();
     }
 }
