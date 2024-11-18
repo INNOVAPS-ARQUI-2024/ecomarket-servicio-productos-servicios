@@ -3,6 +3,7 @@ package com.example.ecomarket_servicio_productos_servicios.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -10,7 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,8 +27,9 @@ public class ProductoController {
     private ProductoService productoService;
 
     @GetMapping
-    public List<Producto> obtenerProductos() {
-        return productoService.obtenerProductos();
+    public ResponseEntity<List<Producto>> getProductos() {
+        List<Producto> productos = this.productoService.obtenerProductos();
+        return new ResponseEntity<>(productos, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -83,7 +84,8 @@ public class ProductoController {
             detallesProducto.setStock(stock);
 
             Producto productoActualizado = productoService.actualizarProducto(id, detallesProducto, picture);
-            return productoActualizado != null ? ResponseEntity.ok(productoActualizado) : ResponseEntity.notFound().build();
+            return productoActualizado != null ? ResponseEntity.ok(productoActualizado)
+                    : ResponseEntity.notFound().build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(400).body(null); // Solicitud incorrecta
         }
@@ -100,7 +102,7 @@ public class ProductoController {
         List<Producto> productos = productoService.obtenerProductosPorUsuario(sellerId);
         return ResponseEntity.ok(productos);
     }
-    
+
     @GetMapping("/categoria/{categoria}")
     public List<Producto> obtenerProductosPorCategoria(@PathVariable("categoria") String categoria) {
         return productoService.getProductosPorCategoria(categoria);
